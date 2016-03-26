@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>test</title>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.2/angular.min.js"></script>
+        <script type="text/javascript" src="modules/main.js"></script>
+    </head>
+    <body ng-app="main">
+        <div ng-controller="myCtrl as ctr">
+            <h1>{{ctr.message}}</h1>
+            <ul>
+                <li ng-repeat="song in ctr.allSongs"><img src="{{song.thumbnail}}" width="100" height="100" ng-click="ctr.PlaySound(song.id)"> </li>
+            </ul>
+            <input name="url" ng-model="ctr.url">
+            <button ng-click="ctr.AddSong()">Add</button>
+            {{ctr.playerStatus}}
+        </div>
+    </body>
+</html>
