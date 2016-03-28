@@ -3,16 +3,42 @@
         <title>test</title>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.2/angular.min.js"></script>
         <script type="text/javascript" src="modules/main.js"></script>
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="css/style.css">
     </head>
     <body ng-app="main">
         <div ng-controller="myCtrl as ctr">
-            <h1>{{ctr.message}}</h1>
-            <ul>
-                <li ng-repeat="song in ctr.allSongs"><img src="{{song.thumbnail}}" width="100" height="100" ng-click="ctr.PlaySound(song.id)"> </li>
-            </ul>
-            <input name="url" ng-model="ctr.url">
-            <button ng-click="ctr.AddSong()">Add</button>
-            {{ctr.playerStatus}}
+            <div class="add-song">
+                <input class="search-field" name="url" ng-model="ctr.url">
+                <a ng-click="ctr.AddSong()">Add</a>
+            </div>
+            <div class="container">
+                <div class="songs">
+                    <ul>
+                        <tile ng-repeat="song in ctr.allSongs" contr="ctr" song="song"></tile>
+                    </ul>
+                </div>
+                <div ng-controller="playerController as player">
+                    <h2>Now Playing</h2>
+                    <button ng-show="player.player.playState" ng-click="player.Pause()">Pause</button>
+                    <button ng-hide="player.player.playState" ng-click="player.Resume()">Play</button>
+                    <br>
+                    {{player.player.title}}
+                    <br>
+                    {{player.player.thumbnail}}
+
+                    <br>
+                    <ul>
+                        <li ng-repeat="queue in player.player.queue">{{queue.title}}</li>
+                    </ul>
+
+                    Current Time {{player.player.currentSec}}
+                    Duration {{player.player.duration}}
+                </div>
+            </div>
         </div>
+
     </body>
 </html>

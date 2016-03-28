@@ -1,0 +1,115 @@
+body{
+    background-color: #62744A;
+    color: whitesmoke;
+    margin: 0;
+}
+
+body a:hover{
+    text-decoration: none;
+}
+
+.songs{
+    width: 100%;
+    height: 450px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.songs ul{
+    list-style: none;
+    width: 100%;
+}
+
+.songs ul li{
+    display: inline-block;
+}
+
+.songs ul li .single-tail{
+    display: inline-block;
+    position: relative;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.songs ul li .single-tail .info{
+    white-space: normal;
+    width: 11em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.songs ul li .single-tail .controls{
+    position: absolute;
+    bottom: 40px;
+    color: white;
+    display: none;
+    z-index: 1001;
+}
+
+.songs ul li .single-tail .play{
+    position: absolute;
+    bottom: 37px;
+    color: white;
+    display: none;
+    background-color: black;
+    width: 100%;
+    height: 101px;
+    z-index: 1000;
+    opacity: 0.4;
+    text-align: center;
+    line-height: 7;
+}
+
+.songs ul li .single-tail .play img{
+    margin-top: 20px;
+}
+
+.songs ul li .single-tail .controls .queue{
+    padding: 5px;
+    color: white;
+    background: #993030;
+    cursor: pointer;
+    z-index: 999;
+}
+
+.songs ul li .single-tail .controls .queue:hover{
+    background-color: #A34848;
+}
+
+.songs ul li .single-tail:hover > .controls,
+.songs ul li .single-tail:hover > .play{
+    display: block;
+}
+
+.add-song{
+    position: fixed;
+    width: 100%;
+    text-align: center;
+    height: 35px;
+    top: 0;
+    padding-top: 10px;
+    background-color: #513939;
+    z-index: 10000;
+    box-sizing: content-box;
+}
+.container{
+    margin-top: 56px;
+    width: 100%;
+}
+
+.add-song .search-field{
+    width: 400px;
+    height: 28px;
+    padding: 10px;
+    color: black;
+}
+
+.add-song a{
+    cursor: pointer;
+    margin-left: 15px;
+    background-color: white;
+    padding: 4px 10px 6px 10px;
+    color: black;
+    border-radius: 3px;
+}
