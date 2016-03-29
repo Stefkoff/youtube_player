@@ -71,7 +71,7 @@
                                 <div class="col-md-11">
                                     <div class="queue">
                                         <data-owl-carousel class="owl-carousel">
-                                            <div owl-carousel-item="" ng-repeat="queue in player.player.queue" class="item">
+                                            <div owl-carousel-item="" queue="player.player.queue" ng-repeat="queue in player.player.queue" class="item">
                                                 <img ng-src="images/thumbnails/{{queue.id}}.jpeg" width="110" height="60">
                                                     <i class="fa fa-times fa-lg" ng-click="player.RemoveFromQueue(queue.id)"></i>
                                             </div>

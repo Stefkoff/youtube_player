@@ -187,13 +187,14 @@
         };
 
         this.RemoveFromQueue = function(id) {
-            var oldQueue = $this.queue;
-            $this.queue = [];
-            for(var i = 0; i < oldQueue.length; i++){
-                if(typeof oldQueue[i].id !== "undefined" && oldQueue[i].id != id){
-                    $this.queue.push(oldQueue[i]);
+            var newQueue = [];
+            for(var i = 0; i < $this.queue.length; i++){
+                if(typeof $this.queue[i].id !== "undefined" && $this.queue[i].id != id){
+                    newQueue.push($this.queue[i]);
                 }
             }
+
+            $this.queue = newQueue;
         };
 
         this.AddSong = function(url, callback) {
@@ -293,26 +294,60 @@
             }
         };
     });
-    app.directive('owlCarouselItem', ['Player', '$rootScope', function(Player, $rootScope) {
+    app.directive('owlCarouselItem', ['Player', '$timeout', function(Player, $timeout) {
             return {
                 restrict: 'A',
                 transclude: false,
+                scope: {
+                    queue: '='
+                },
                 link: function(scope, element) {
                     // wait for the last item in the ng-repeat then call init
                     if(scope.$last) {
                         console.log('no');
                         scope.initCarousel(element.parent());
                     }
-                    scope.$watch(Player.queue, function() {
+                    scope.$watch('queue', function() {
                         console.log('change');
-                        scope.destroyCarousel(element.parent());
-                        scope.initCarousel(element.parent());
+                        $(element).trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                        $(element.parent()).owlCarousel({
+                            margin:10,
+                            autoWidth: false,
+                            responsive:{
+                                0:{
+                                    items:1
+                                },
+                                600:{
+                                    items:3
+                                },
+                                1000:{
+                                    items:5
+                                }
+                            }
+                        });
                     });
 
-                    // $(element).find('i').bind('click', function() {
-                    //     scope.destroyCarousel(element.parent());
-                    //     scope.initCarousel(element.parent());
-                    // });
+                    $(element).find('i').bind('click', function() {
+                        console.log('test');
+                        $timeout(function(){
+                            $(element).trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                            $(element.parent()).owlCarousel({
+                                margin:10,
+                                autoWidth: false,
+                                responsive:{
+                                    0:{
+                                        items:1
+                                    },
+                                    600:{
+                                        items:3
+                                    },
+                                    1000:{
+                                        items:5
+                                    }
+                                }
+                            });
+                        })
+                    });
                 }
             };
         }]);
