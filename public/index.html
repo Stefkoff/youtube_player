@@ -2,22 +2,36 @@
     <head>
         <title>test</title>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.2/angular.min.js"></script>
-        <script type="text/javascript" src="modules/main.js"></script>
         <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <script src="https://apis.google.com/js/client.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="css/style.css">
+        <script type="text/javascript" src="modules/main.js"></script>
     </head>
     <body ng-app="main">
         <div ng-controller="myCtrl as ctr">
-            <div class="add-song">
-                <input class="search-field" name="url" ng-model="ctr.url">
-                <a ng-click="ctr.AddSong()">Add</a>
+            <div class="header">
+                <div class="row">
+                    <div class="col-md-4" ng-controller="YouTubeController as youtubeCtr">
+                        <youtubesearch controller="youtubeCtr"></youtubesearch>
+                    </div>
+                    <div class="col-md-4">
+                        <addsong controller="ctr"></addsong>
+                    </div>
+                    <div class="col-md-4" >
+                        <div class="search-container">
+                            <input ng-model="ctr.searchTerm"><i class="fa fa-search fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="container">
                 <div class="songs">
                     <ul>
-                        <tile ng-repeat="song in ctr.allSongs" contr="ctr" song="song"></tile>
+                        <tile ng-repeat="song in ctr.allSongs | filter:ctr.searchTerm" contr="ctr" song="song"></tile>
                     </ul>
                 </div>
                 <div ng-controller="playerController as player">
@@ -27,11 +41,10 @@
                     <br>
                     {{player.player.title}}
                     <br>
-                    {{player.player.thumbnail}}
 
                     <br>
                     <ul>
-                        <li ng-repeat="queue in player.player.queue">{{queue.title}}</li>
+                        <li ng-repeat="queue in player.player.queue">{{queue.title}} | {{queue.id}}</li>
                     </ul>
 
                     Current Time {{player.player.currentSec}}

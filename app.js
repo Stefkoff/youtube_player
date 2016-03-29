@@ -1,5 +1,6 @@
 var youtubedl = require('youtube-dl');
 var fs = require('fs');
+var request = require('request');
 var redis = require('redis');
 var Player = require('./modules/player');
 var express = require('express');
@@ -40,6 +41,10 @@ var changeRedisStatus = function(data){
     });
 };
 
+var downloadImage = function(uri, filename, callback){
+    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+};
+
 player1.on('finishplay', function() {
     var redisClient = redis.createClient(redisConfig);
 
@@ -54,7 +59,7 @@ player1.on('finishplay', function() {
                                     if(!errGet){
                                         io.emit('queuechange', {
                                             title: resMusic.title,
-                                            thumbnail: resMusic.thumbnail
+                                            id: resMusic.id
                                         });
                                         changeRedisStatus({
                                             state: 'playing',
@@ -123,7 +128,6 @@ io.on('connection', function(socket) {
                                                                     io.emit('init', {
                                                                         state: resGet.state,
                                                                         title: resGetMusic.title,
-                                                                        thumbnail: resGetMusic.thumbnail,
                                                                         id: resGetMusic.id,
                                                                         time: currentTime,
                                                                         duration: currentDuration,
@@ -140,7 +144,6 @@ io.on('connection', function(socket) {
                                                     io.emit('init', {
                                                         state: resGet.state,
                                                         title: resGetMusic.title,
-                                                        thumbnail: resGetMusic.thumbnail,
                                                         id: resGetMusic.id,
                                                         time: currentTime,
                                                         duration: currentDuration,
@@ -229,7 +232,6 @@ app.get('/api/play/:id', function(req, res) {
                     player1.openFile('./music/' + id + '.mp3');
                     io.emit('play', {
                         title: music.title,
-                        thumbnail: music.thumbnail,
                         duration: music.duration
                     });
 
@@ -238,7 +240,6 @@ app.get('/api/play/:id', function(req, res) {
                         update: true,
                         status: player1.status.playing,
                         title: music.title,
-                        thumbnail: music.thumbnail,
                         id: music.id,
                         duration: music.duration
                     }));
@@ -282,7 +283,6 @@ app.post('/api/queue', function(req, res) {
                                     redisClient.hgetall('music:' + id, function(errGet, resGet) {
                                         if(!errGet){
                                             io.emit('queueadd', resGet);
-
                                             res.send(resGet);
                                         }
                                     });
@@ -297,6 +297,7 @@ app.post('/api/queue', function(req, res) {
 });
 
 app.post('/api/add', function(req, res) {
+    io.emit('loading', true);
     var url = req.body.url;
     youtubedl.getInfo(url, [], function(err, info) {
         if(err) return;
@@ -340,17 +341,21 @@ app.post('/api/add', function(req, res) {
                                     }
                                 }
 
-                                redisClient.hmset('music:' + info.id, {
-                                    id: info.id,
-                                    thumbnail: thumb,
-                                    title: info.title,
-                                    duration: durationInSec
-                                }, function() {
-                                    res.send(JSON.stringify({
+                                downloadImage(thumb, './public/images/thumbnails/' + info.id + '.jpeg', function(){
+                                    redisClient.hmset('music:' + info.id, {
                                         id: info.id,
-                                        thumbnail: thumb,
-                                        title: info.title
-                                    }));
+                                        title: info.title,
+                                        duration: durationInSec
+                                    }, function() {
+                                        io.emit('new-song', {
+                                            id: info.id,
+                                            title: info.title
+                                        });
+                                        res.send(JSON.stringify({
+                                            id: info.id,
+                                            title: info.title
+                                        }));
+                                    });
                                 });
                             });
                         });

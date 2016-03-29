@@ -3,6 +3,7 @@
  */
 (function(angular) {
     'use strict';
+    var CLIENT_SICRET = 'RtzZ1nbMlzOJAKrjrdEhdHUw';
     var app = angular.module('main', []);
     
     app.factory('socket', function($rootScope) {
@@ -26,6 +27,38 @@
                         }
                     });
                 })
+            }
+        }
+    });
+
+    app.factory('YouTube', function($rootScope) {
+        var CLIENT_ID = '364688060695-9crc1ceidshbi940ntdq1b5n663l48uc.apps.googleusercontent.com';
+        var OAUTH2_SCOPES = [
+            'https://www.googleapis.com/auth/youtube'
+        ];
+        setTimeout(function() {
+            gapi.auth.authorize({
+                client_id: CLIENT_ID,
+                scope: OAUTH2_SCOPES,
+                immediate: true
+            }, function() {
+                gapi.client.load('youtube', 'v3');
+            });
+        }, 1000);
+
+        return {
+            search: function(term, callback){
+                var request = gapi.client.youtube.search.list({
+                    q: term,
+                    part: 'snippet'
+                });
+
+                request.execute(function() {
+                    var args = arguments;
+                    $rootScope.$apply(function() {
+                        callback.apply(request, args);
+                    });
+                });
             }
         }
     });
@@ -210,10 +243,93 @@
         return directive;
     });
 
+    app.directive('addsong', function(){
+        var directive = {};
+
+        directive.restrict = 'E';
+        directive.template = '<div class="add-song"><input class="search-field" name="url" ng-model="controller.url"><a id="add-song-button" ng-click="controller.AddSong()" class="ng-class:controller.inLoading">{{controller.inLoading === "" ? "Add" : ""}}</a></div>';
+        directive.scope = {
+            controller: '=controller'
+        };
+
+        return directive;
+    });
+
+    app.directive('youtubesearch', function() {
+        var directive = {};
+
+        directive.restrict = 'E';
+        directive.scope = {
+            controller: '='
+        };
+        directive.templateUrl = 'youtube_search.html';
+        directive.link = function(scope, element, attr) {
+            $(element).find('#youbute-search-button').bind('click', function() {
+                $(element).find('.search-results').show();
+            });
+
+            $(element).find('.search-item').bind('click', function() {
+                $(element).find('.search-results').hide();
+            });
+
+            $(document).bind('click', function(event) {
+                var eventClass = $(event.target).attr('class');
+                if(eventClass){
+                    var classes = eventClass.split(' ');
+                    if(classes.indexOf("youtube-search") < 0 && classes.indexOf('youbute-search-button') < 0){
+                        $(element).find('.search-results').hide();
+                    }
+                }
+            });
+        };
+
+        return directive;
+    });
+
+    app.controller('YouTubeController', function(YouTube, Player, socket) {
+        this.term = '';
+        this.result = [];
+
+        var $this = this;
+        this.Search = function(){
+            this.result = [];
+            YouTube.search($this.term, function(res){
+                if(res){
+                    var result = res.result;
+                    var items = result.items;
+                    for(var i in items){
+                        var item = items[i];
+                        if(item.id.kind == "youtube#channel") continue;
+
+                        var videoId = item.id.videoId;
+                        var snippet = item.snippet;
+                        var title = snippet.title;
+                        var thumbnail = snippet.thumbnails.default.url;
+                        $this.result.push({
+                            title: title,
+                            id: videoId,
+                            thumbnail: thumbnail
+                        });
+                    }
+                }
+            });
+        };
+
+        this.Add = function(id) {
+            if(id){
+                Player.AddSong('https://www.youtube.com/watch?v=' + id, function(data) {
+                    $this.term = '';
+                });
+            }
+        };
+    });
+
     app.controller('myCtrl', function(ApiCall, Player, TimeConverter, socket) {
         this.allSongs = [];
         this.queue = [];
         this.url = '';
+        this.searchTerm = '';
+        this.inLoading = '';
 
         socket.on('timechange', function(data) {
             Player.currentSec = TimeConverter.resolveSeconds(data);
@@ -245,6 +361,20 @@
                 Player.SetTitle(data.title);
                 Player.SetThumbnail(data.thumbnail);
                 Player.duration = TimeConverter.resolveSeconds(data.duration)
+            }
+        });
+
+        socket.on('new-song', function(data) {
+            if(data){
+                $this.inLoading = '';
+                $this.allSongs.push(data);
+            }
+        });
+
+        socket.on('loading', function(data) {
+            console.log('test');
+            if(data){
+                $this.inLoading = 'loading';
             }
         });
 
@@ -303,9 +433,8 @@
         };
 
         this.AddSong = function() {
-            Player.AddSong(this.url, function(data) {
-                $this.allSongs.push(data);
-            });
+            $this.inLoading = 'loading';
+            Player.AddSong(this.url);
         };
 
         this.AddToQueue = function(id){

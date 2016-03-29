@@ -1,0 +1,13 @@
+<div class='youtube-search'>
+    <input ng-model='controller.term'>
+    <a class='youbute-search-button' id="youbute-search-button" ng-click='controller.Search()'><img src="images/search-youtube.png" width="30" height="30"> </a>
+    <div class='search-results'>
+        <ul>
+            <li ng-repeat='result in controller.result'>
+                <div class="search-item" ng-click="controller.Add(result.id)">
+                    <img src="{{result.thumbnail}}" width="100" height="80"> {{result.title}}
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
