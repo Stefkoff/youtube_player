@@ -1,6 +1,6 @@
 <li>
     <div class="single-tail">
-        <img src="{{'images/thumbnails/' + song.id + '.jpeg'}}" width="196" height="100" ng-click="controller.PlaySound(song.id)">
+        <img ng-src="images/thumbnails/{{song.id }}.jpeg" width="196" height="100" ng-click="controller.PlaySound(song.id)">
         <div class="play" ng-click="controller.PlaySound(song.id)">
             <img src="images/play.png" width="50" height="50">
         </div>

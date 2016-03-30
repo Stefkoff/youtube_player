@@ -121,6 +121,17 @@
 
             return result;
         };
+
+        this.RemoveFromQueue = function(id){
+            var result;
+            if(typeof id !== "undefined"){
+                result = $http.get('/api/removequeue/' + id).success(function(data) {
+                    result = (data);
+                });
+            }
+
+            return result;
+        }
     }]);
 
     app.service('Player', function(ApiCall, TimeConverter) {
@@ -175,14 +186,22 @@
             }
         };
 
-        this.RemoveFromQueue = function() {
-            $this.queue.pop();
+        this.RemoveFromQueue = function(id) {
+            var oldQueue = $this.queue;
+            $this.queue = [];
+            for(var i = 0; i < oldQueue.length; i++){
+                if(typeof oldQueue[i].id !== "undefined" && oldQueue[i].id != id){
+                    $this.queue.push(oldQueue[i]);
+                }
+            }
         };
 
         this.AddSong = function(url, callback) {
             ApiCall.AddSong(url).success(function(data) {
                 if(typeof data !== "undefined"){
-                    callback(data);
+                    if(callback !== "undefined"){
+                        callback(data);
+                    }
                 }
             });
         };
@@ -242,6 +261,61 @@
 
         return directive;
     });
+
+    app.directive("owlCarousel", function() {
+        return {
+            restrict: 'E',
+            transclude: false,
+            link: function (scope) {
+                scope.destroyCarousel = function(element){
+                    console.log('1');
+                    $(element).trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                };
+                scope.initCarousel = function(element) {
+                    console.log(2);
+                    // init carousel
+                    $(element).owlCarousel({
+                        margin:10,
+                        autoWidth: false,
+                        responsive:{
+                            0:{
+                                items:1
+                            },
+                            600:{
+                                items:3
+                            },
+                            1000:{
+                                items:5
+                            }
+                        }
+                    });
+                };
+            }
+        };
+    });
+    app.directive('owlCarouselItem', ['Player', '$rootScope', function(Player, $rootScope) {
+            return {
+                restrict: 'A',
+                transclude: false,
+                link: function(scope, element) {
+                    // wait for the last item in the ng-repeat then call init
+                    if(scope.$last) {
+                        console.log('no');
+                        scope.initCarousel(element.parent());
+                    }
+                    scope.$watch(Player.queue, function() {
+                        console.log('change');
+                        scope.destroyCarousel(element.parent());
+                        scope.initCarousel(element.parent());
+                    });
+
+                    // $(element).find('i').bind('click', function() {
+                    //     scope.destroyCarousel(element.parent());
+                    //     scope.initCarousel(element.parent());
+                    // });
+                }
+            };
+        }]);
 
     app.directive('addsong', function(){
         var directive = {};
@@ -372,11 +446,23 @@
         });
 
         socket.on('loading', function(data) {
-            console.log('test');
             if(data){
                 $this.inLoading = 'loading';
             }
         });
+
+        // socket.on('queue-remove', function(data) {
+        //     if(data){
+        //         var newQueue = [];
+        //         for(var i = 0; i < Player.queue.length; i++){
+        //             if(typeof Player.queue[i].id !== "undefined" && Player.queue[i].id != data.id){
+        //                 newQueue.push(Player.queue[i]);
+        //             }
+        //         }
+        //
+        //         Player.queue = newQueue;
+        //     }
+        // });
 
         socket.on('init', function(data) {
             if(data){
@@ -448,7 +534,7 @@
         };
     });
 
-    app.controller('playerController', function (Player) {
+    app.controller('playerController', function (Player, ApiCall) {
         this.player = Player.Player;
 
         this.Pause = function(){
@@ -458,5 +544,11 @@
         this.Resume = function(){
             Player.Play();
         };
+
+        this.RemoveFromQueue = function(id){
+            ApiCall.RemoveFromQueue(id).success(function() {
+                Player.RemoveFromQueue(id);
+            });
+        }
     });
 })(window.angular);

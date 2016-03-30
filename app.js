@@ -296,6 +296,23 @@ app.post('/api/queue', function(req, res) {
     })
 });
 
+app.get('/api/removequeue/:id', function(req, res) {
+    var id = req.params.id;
+
+    var redisClient = redis.createClient({host: params.redisHost, port: params.redisPort});
+
+    redisClient.on('connect', function(err, rep) {
+        this.select(params.redisDb, function(errSelect, repSelect) {
+            redisClient.lrem('queue', 0, id, function(errRem, removetElements) {
+                if(!errRem){
+                    io.emit('queue-remove', {id: id});
+                    res.send({success: true});
+                }
+            });
+        });
+    });
+});
+
 app.post('/api/add', function(req, res) {
     io.emit('loading', true);
     var url = req.body.url;

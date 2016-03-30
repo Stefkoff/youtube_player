@@ -177,3 +177,39 @@ input{
     border: 1px solid white;
     cursor: pointer;
 }
+
+.player{
+    padding: 5px;
+    background-color: #513939;
+}
+
+.player .controls{
+    margin-top: 12px;
+}
+
+.player .controls i{
+    cursor: pointer;
+}
+
+.player .controls .controls-backward,
+.player .controls .controls-forward{
+    margin-left: 7px;
+}
+
+.player .info{
+    padding: 10px;
+    border: 1px solid #7C6F6F;
+}
+
+.player .info .timer{
+    position: relative;;
+    bottom: -20px;
+}
+
+.owl-item .item i{
+    position: relative;
+    top: -60px;
+    left: 95px;
+    color: red;
+    cursor: pointer;
+}

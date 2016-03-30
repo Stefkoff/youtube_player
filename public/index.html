@@ -6,8 +6,10 @@
         <script src="https://apis.google.com/js/client.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/owl.carousel.css">
         <script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
+        <script src="js/owl.carousel.min.js"></script>
         <link rel="stylesheet" href="css/style.css">
         <script type="text/javascript" src="modules/main.js"></script>
     </head>
@@ -36,19 +38,49 @@
                 </div>
                 <div ng-controller="playerController as player">
                     <h2>Now Playing</h2>
-                    <button ng-show="player.player.playState" ng-click="player.Pause()">Pause</button>
-                    <button ng-hide="player.player.playState" ng-click="player.Resume()">Play</button>
-                    <br>
-                    {{player.player.title}}
-                    <br>
-
-                    <br>
-                    <ul>
-                        <li ng-repeat="queue in player.player.queue">{{queue.title}} | {{queue.id}}</li>
-                    </ul>
-
-                    Current Time {{player.player.currentSec}}
-                    Duration {{player.player.duration}}
+                    <div class="player">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <div class="controls">
+                                    <i ng-class="{'fa-pause-circle fa fa-5x': player.player.playState, 'fa-play-circle fa fa-5x': !player.player.playState}" ng-click="player.player.playState ? player.Pause() : player.Resume()"></i>
+                                    <i class="fa fa-step-backward fa-2x controls-backward"></i>
+                                    <i class="fa fa-step-forward fa-2x controls-forward"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <img ng-src="images/thumbnails/{{player.player.id}}.jpeg" width="110" height="60">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="row title">
+                                                {{player.player.title}}
+                                            </div>
+                                            <div class="row timer">
+                                                {{player.player.currentSec}} | {{player.player.duration}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="col-md-1">
+                                    <h4>Queue:</h4>
+                                </div>
+                                <div class="col-md-11">
+                                    <div class="queue">
+                                        <data-owl-carousel class="owl-carousel">
+                                            <div owl-carousel-item="" ng-repeat="queue in player.player.queue" class="item">
+                                                <img ng-src="images/thumbnails/{{queue.id}}.jpeg" width="110" height="60">
+                                                    <i class="fa fa-times fa-lg" ng-click="player.RemoveFromQueue(queue.id)"></i>
+                                            </div>
+                                        </data-owl-carousel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
