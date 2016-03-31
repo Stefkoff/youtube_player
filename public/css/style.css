@@ -59,7 +59,7 @@ input{
 
 .songs ul li .single-tail .play{
     position: absolute;
-    bottom: 37px;
+    bottom: 40px;
     color: white;
     display: none;
     background-color: black;

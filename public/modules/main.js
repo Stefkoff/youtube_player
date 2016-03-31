@@ -266,32 +266,7 @@
     app.directive("owlCarousel", function() {
         return {
             restrict: 'E',
-            transclude: false,
-            link: function (scope) {
-                scope.destroyCarousel = function(element){
-                    console.log('1');
-                    $(element).trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
-                };
-                scope.initCarousel = function(element) {
-                    console.log(2);
-                    // init carousel
-                    $(element).owlCarousel({
-                        margin:10,
-                        autoWidth: false,
-                        responsive:{
-                            0:{
-                                items:1
-                            },
-                            600:{
-                                items:3
-                            },
-                            1000:{
-                                items:5
-                            }
-                        }
-                    });
-                };
-            }
+            transclude: false
         };
     });
     app.directive('owlCarouselItem', ['Player', '$timeout', function(Player, $timeout) {
@@ -303,12 +278,7 @@
                 },
                 link: function(scope, element) {
                     // wait for the last item in the ng-repeat then call init
-                    if(scope.$last) {
-                        console.log('no');
-                        scope.initCarousel(element.parent());
-                    }
                     scope.$watch('queue', function() {
-                        console.log('change');
                         $(element).trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
                         $(element.parent()).owlCarousel({
                             margin:10,
@@ -325,28 +295,6 @@
                                 }
                             }
                         });
-                    });
-
-                    $(element).find('i').bind('click', function() {
-                        console.log('test');
-                        $timeout(function(){
-                            $(element).trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
-                            $(element.parent()).owlCarousel({
-                                margin:10,
-                                autoWidth: false,
-                                responsive:{
-                                    0:{
-                                        items:1
-                                    },
-                                    600:{
-                                        items:3
-                                    },
-                                    1000:{
-                                        items:5
-                                    }
-                                }
-                            });
-                        })
                     });
                 }
             };
@@ -445,7 +393,7 @@
         });
 
         socket.on('queuechange', function(data) {
-            Player.RemoveFromQueue();
+            Player.RemoveFromQueue(data.id);
             Player.SetTitle(data.title);
             Player.SetThumbnail(data.thumbnail);
         });
@@ -468,7 +416,7 @@
             Player.inPause = false;
             if(data){
                 Player.SetTitle(data.title);
-                Player.SetThumbnail(data.thumbnail);
+                Player.id = data.id;
                 Player.duration = TimeConverter.resolveSeconds(data.duration)
             }
         });
@@ -486,18 +434,18 @@
             }
         });
 
-        // socket.on('queue-remove', function(data) {
-        //     if(data){
-        //         var newQueue = [];
-        //         for(var i = 0; i < Player.queue.length; i++){
-        //             if(typeof Player.queue[i].id !== "undefined" && Player.queue[i].id != data.id){
-        //                 newQueue.push(Player.queue[i]);
-        //             }
-        //         }
-        //
-        //         Player.queue = newQueue;
-        //     }
-        // });
+        socket.on('queue-remove', function(data) {
+            if(data){
+                var newQueue = [];
+                for(var i = 0; i < Player.queue.length; i++){
+                    if(typeof Player.queue[i].id !== "undefined" && Player.queue[i].id != data.id){
+                        newQueue.push(Player.queue[i]);
+                    }
+                }
+
+                Player.queue = newQueue;
+            }
+        });
 
         socket.on('init', function(data) {
             if(data){
@@ -528,7 +476,7 @@
                 Player.inPause = !playState;
                 Player.queue = data.queue;
                 Player.SetTitle(data.title);
-                Player.SetThumbnail(data.thumbnail);
+                Player.id = data.id;
             }
         });
 

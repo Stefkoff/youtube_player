@@ -135,31 +135,6 @@ Player.prototype = _.extend({
     mute: function() {
         this.status.muted = !this.status.muted;
         this.player.cmd('mute');
-    },
-    fullscreen: function() {
-        this.status.fullscreen = !this.status.fullscreen;
-        this.player.cmd('vo_fullscreen');
-    },
-    hideSubtitles: function() {
-        this.player.cmd('sub_visibility', [-1]);
-    },
-    showSubtitles: function() {
-        this.player.cmd('sub_visibility', [1]);
-    },
-    cycleSubtitles: function() {
-        this.player.cmd('sub_select');
-    },
-    speedUpSubtitles: function() {
-        this.player.cmd('sub_step', [1]);
-    },
-    slowDownSubtitles: function() {
-        this.player.cmd('sub_step', [-1]);
-    },
-    adjustSubtitles: function(seconds) {
-        this.player.cmd('sub_delay', [seconds]);
-    },
-    adjustAudio: function(seconds) {
-        this.player.cmd('audio_delay', [seconds]);
     }
 }, EventEmitter);
 

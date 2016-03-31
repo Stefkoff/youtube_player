@@ -120,10 +120,10 @@ io.on('connection', function(socket) {
                                                 if(listLen > 0){
                                                     var index = 0;
                                                     for(var i = 0; i < listLen; i++){
-                                                        redisClient.hgetall('music:' + resQueue[i], function(errGetMusic, resGetMusic) {
+                                                        redisClient.hgetall('music:' + resQueue[i], function(errGetMusicQueue, resGetMusicQueue) {
                                                             index++;
-                                                            if(!errGetMusic){
-                                                                data.push(resGetMusic);
+                                                            if(!errGetMusicQueue){
+                                                                data.push(resGetMusicQueue);
                                                                 if(index == listLen){
                                                                     io.emit('init', {
                                                                         state: resGet.state,
@@ -177,11 +177,6 @@ app.get('/', function(req, res) {
     res.sendFile('index');
 });
 
-app.get('/play', function(req, res) {
-    player1.openFile('./music/H7HmzwI67ec.mp3');
-    res.sendfile('./public/play.html');
-});
-
 app.get('/api/all', function(req, res) {
     var redisClient = redis.createClient({host: params.redisHost, port: params.redisPort});
 
@@ -232,6 +227,7 @@ app.get('/api/play/:id', function(req, res) {
                     player1.openFile('./music/' + id + '.mp3');
                     io.emit('play', {
                         title: music.title,
+                        id: music.id,
                         duration: music.duration
                     });
 
