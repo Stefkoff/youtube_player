@@ -11,3 +11,5 @@ For runnig the app, you will need:
 
 4) redis
 
+5) ffmpeg
+

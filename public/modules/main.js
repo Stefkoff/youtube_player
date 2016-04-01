@@ -131,7 +131,18 @@
             }
 
             return result;
-        }
+        };
+
+        this.SetVolume = function(volume){
+            var result;
+            if(typeof volume !== "undefined"){
+                result = $http.post('/api/volume', {value: volume}).success(function(data){
+                   result = (data);
+                });
+            }
+
+            return result;
+        };
     }]);
 
     app.service('Player', function(ApiCall, TimeConverter) {
@@ -142,6 +153,7 @@
         this.thumbnail = false;
         this.queue = [];
         this.duration = 0;
+        this.volume = 0;
         this.currentSec = 0;
 
         var $this = this;
@@ -203,6 +215,15 @@
                     if(callback !== "undefined"){
                         callback(data);
                     }
+                }
+            });
+        };
+
+        this.SetVolume = function(volume, callback){
+            ApiCall.SetVolume(volume).success(function(data) {
+                if(typeof callback !== "undefined"){
+                    callback(data);
+                    $this.volume = volume;
                 }
             });
         };
@@ -269,7 +290,35 @@
             transclude: false
         };
     });
-    app.directive('owlCarouselItem', ['Player', '$timeout', function(Player, $timeout) {
+
+    app.directive('volumeControl', function(){
+        return {
+            restrict: 'E',
+            scope: {
+                volume: '=volume',
+                controller: '=controller'
+            },
+            template: "<div class='volume-control'><div class='slider'></div> </div>",
+            link: function(scope, element){
+                $(element).find('.slider').slider({
+                    value: scope.volume,
+                    range: 'min',
+                    min: 0,
+                    max: 100,
+                    slide: function( event, ui ) {
+                        scope.volume = ui.value;
+                        scope.controller.SetVolume(scope.volume);
+                    }
+                });
+
+                scope.$watch('volume', function(newValue){
+                    $(element).find('.slider').slider("value", newValue);
+                });
+            }
+        }
+    });
+
+    app.directive('owlCarouselItem', function() {
             return {
                 restrict: 'A',
                 transclude: false,
@@ -298,7 +347,7 @@
                     });
                 }
             };
-        }]);
+        });
 
     app.directive('addsong', function(){
         var directive = {};
@@ -447,6 +496,12 @@
             }
         });
 
+        socket.on('volume', function(data) {
+            if(data){
+                Player.volume = data;
+            }
+        });
+
         socket.on('init', function(data) {
             if(data){
                 var playState = false;
@@ -477,6 +532,7 @@
                 Player.queue = data.queue;
                 Player.SetTitle(data.title);
                 Player.id = data.id;
+                Player.volume = data.volume;
             }
         });
 
@@ -532,6 +588,10 @@
             ApiCall.RemoveFromQueue(id).success(function() {
                 Player.RemoveFromQueue(id);
             });
+        };
+
+        this.SetVolume = function(volume){
+            Player.SetVolume(volume);
         }
     });
 })(window.angular);

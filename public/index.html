@@ -7,7 +7,10 @@
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/font-awesome.min.css">
         <link rel="stylesheet" href="css/owl.carousel.css">
+        <link rel="stylesheet" href="css/jquery-ui.css">
+        <link rel="stylesheet" href="css/jquery-ui.theme.css">
         <script type="text/javascript" src="js/jquery-1.12.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="js/owl.carousel.min.js"></script>
         <link rel="stylesheet" href="css/style.css">
@@ -45,6 +48,7 @@
                                     <i ng-class="{'fa-pause-circle fa fa-5x': player.player.playState, 'fa-play-circle fa fa-5x': !player.player.playState}" ng-click="player.player.playState ? player.Pause() : player.Resume()"></i>
                                     <i class="fa fa-step-backward fa-2x controls-backward"></i>
                                     <i class="fa fa-step-forward fa-2x controls-forward"></i>
+                                    <volume-control volume="player.player.volume" controller="player"></volume-control>
                                 </div>
                             </div>
                             <div class="col-md-3">

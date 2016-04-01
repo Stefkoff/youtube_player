@@ -16,6 +16,7 @@ try{
 
 var currentPlayerTimer = 0;
 var currentPlayerDuration = 0;
+var volume = 0;
 
 var redisConfig = {
     host: params.redisHost,
@@ -117,6 +118,12 @@ io.on('connection', function(socket) {
                                                 var listLen = resQueue.length;
                                                 var data = [];
 
+                                                var volume = 0;
+
+                                                if(typeof resGet.volume !== "undefined"){
+                                                    volume = resGet.volume;
+                                                }
+
                                                 if(listLen > 0){
                                                     var index = 0;
                                                     for(var i = 0; i < listLen; i++){
@@ -124,6 +131,7 @@ io.on('connection', function(socket) {
                                                             index++;
                                                             if(!errGetMusicQueue){
                                                                 data.push(resGetMusicQueue);
+
                                                                 if(index == listLen){
                                                                     io.emit('init', {
                                                                         state: resGet.state,
@@ -131,7 +139,8 @@ io.on('connection', function(socket) {
                                                                         id: resGetMusic.id,
                                                                         time: currentTime,
                                                                         duration: currentDuration,
-                                                                        queue: data
+                                                                        queue: data,
+                                                                        volume: volume
                                                                     });
                                                                 }
                                                             } else{
@@ -147,7 +156,8 @@ io.on('connection', function(socket) {
                                                         id: resGetMusic.id,
                                                         time: currentTime,
                                                         duration: currentDuration,
-                                                        queue: data
+                                                        queue: data,
+                                                        volume: volume
                                                     });
                                                 }
                                             });
@@ -308,6 +318,14 @@ app.get('/api/removequeue/:id', function(req, res) {
             });
         });
     });
+});
+
+app.post('/api/volume', function(req, res) {
+    var volume = req.body.value;
+    changeRedisStatus({volume: volume});
+    player1.volume(volume);
+    io.emit('volume', volume);
+    res.send({success: true});
 });
 
 app.post('/api/add', function(req, res) {
