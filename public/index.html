@@ -51,24 +51,24 @@
                                     <volume-control volume="player.player.volume" controller="player"></volume-control>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="info">
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <img ng-src="images/thumbnails/{{player.player.id}}.jpeg" width="110" height="60">
+                                            <img ng-src="images/thumbnails/{{player.player.id}}.jpeg">
                                         </div>
                                         <div class="col-md-8">
-                                            <div class="row title">
-                                                {{player.player.title}}
+                                            <div class="container-fluid title">
+                                                <p title="{{player.player.title}}">{{player.player.title | limitTo:35}}</p>
                                             </div>
-                                            <div class="row timer">
+                                            <div class="container-fluid timer">
                                                 {{player.player.currentSec}} | {{player.player.duration}}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-7">
                                 <div class="col-md-1">
                                     <h4>Queue:</h4>
                                 </div>

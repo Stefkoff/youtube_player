@@ -13,9 +13,7 @@ input{
 }
 
 .header input{
-    width: 400px;
-    height: 28px;
-    padding: 10px;
+    width: 80%;
 }
 
 .songs{
@@ -44,14 +42,15 @@ input{
 
 .songs ul li .single-tail .info{
     white-space: normal;
-    width: 11em;
+    width: 13em;
     overflow: hidden;
     text-overflow: ellipsis;
+    height:40px;
 }
 
 .songs ul li .single-tail .controls{
     position: absolute;
-    bottom: 40px;
+    bottom: 43px;
     color: white;
     display: none;
     z-index: 1001;
@@ -93,15 +92,8 @@ input{
 }
 
 .header{
-    position: fixed;
-    width: 100%;
-    text-align: center;
-    height: 35px;
-    top: 0;
-    padding-top: 10px;
     background-color: #513939;
-    z-index: 10000;
-    box-sizing: content-box;
+    padding: 10px;
 }
 .container{
     margin-top: 56px;
@@ -109,15 +101,13 @@ input{
 }
 
 .header .add-song .search-field{
-    width: 400px;
-    height: 28px;
-    padding: 10px;
+    width: 80%;
     color: black;
 }
 
 .header .add-song a{
     cursor: pointer;
-    margin-left: 15px;
+    margin-left: 5px;
     background-color: white;
     padding: 4px 10px 6px 10px;
     color: black;
@@ -131,7 +121,6 @@ input{
 }
 
 .header .search-container{
-    position: absolute;
 }
 
 .header .search-container input{
@@ -145,7 +134,6 @@ input{
 
 .header .youtube-search{
     text-align: left;
-    margin-left: 20px;
 }
 
 .header .youtube-search .youbute-search-button{
@@ -158,6 +146,7 @@ input{
     display: none;
     top: 35px;
     border: 1px solid #513939;
+    z-index: 999;
 }
 
 .header .youtube-search .search-results ul{
@@ -206,10 +195,23 @@ input{
     bottom: -20px;
 }
 
+.player .info p{
+    margin: 0;
+}
+
+.player .info img{
+    width: 100%;
+}
+
 .owl-item .item i{
     position: relative;
     top: -60px;
     left: 95px;
     color: red;
     cursor: pointer;
+}
+
+.ui-widget-header{
+    background: none;
+    background-color: #6D6A6A;
 }

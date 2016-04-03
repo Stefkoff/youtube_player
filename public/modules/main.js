@@ -212,7 +212,7 @@
         this.AddSong = function(url, callback) {
             ApiCall.AddSong(url).success(function(data) {
                 if(typeof data !== "undefined"){
-                    if(callback !== "undefined"){
+                    if(typeof callback !== "undefined"){
                         callback(data);
                     }
                 }
@@ -240,34 +240,16 @@
     });
 
     app.service('TimeConverter', function(){
-        var formatTime = function(hours, minutes, seconds){
-            var data = '';
-            for(var i in arguments){
-                if(arguments[i] < 10){
-                    data = data + '0';
-                }
+        this.resolveSeconds = function(data){
+            var sec_num = parseInt(data, 10); // don't forget the second param
+            var hours   = Math.floor(sec_num / 3600);
+            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+            var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-                data += arguments[i];
-                if(i < arguments.length - 1){
-                    data += ':';
-                }
-            }
-
-            return data;
-        };
-
-        this.resolveSeconds = function(seconds){
-            var mins = parseInt(seconds / 60);
-            var hours = 0;
-
-            if(mins >= 60){
-                hours = parseInt(mins / 60);
-            }
-
-            var secsLeft = Math.ceil(seconds - (mins * 60));
-            formatTime(hours, mins, secsLeft);
-
-            return formatTime(hours, mins, secsLeft);
+            if (hours   < 10) {hours   = "0"+hours;}
+            if (minutes < 10) {minutes = "0"+minutes;}
+            if (seconds < 10) {seconds = "0"+seconds;}
+            return hours+':'+minutes+':'+seconds;
         };
     });
 
@@ -444,7 +426,7 @@
         socket.on('queuechange', function(data) {
             Player.RemoveFromQueue(data.id);
             Player.SetTitle(data.title);
-            Player.SetThumbnail(data.thumbnail);
+            Player.id = data.id;
         });
 
         socket.on('queueadd', function(data){

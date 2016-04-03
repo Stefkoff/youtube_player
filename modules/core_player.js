@@ -13,7 +13,7 @@ var CorePlayer = function(options) {
 CorePlayer.prototype = _.extend({
     spawn: function() {
         var instance = spawn('mplayer',
-            ['-msglevel', 'global=6', '-msglevel', 'cplayer=4', '-idle', '-slave', '-fs', '-noborder']
+            ['-msglevel',  'global=6', '-msglevel', 'cplayer=4', '-idle', '-slave', '-fs', '-noborder', '-ao', 'pulse', '-identify']
         );
 
         this.setStatus();
@@ -116,8 +116,8 @@ CorePlayer.prototype = _.extend({
             this.emit('timechange', time);
         }
 
-        if(data.indexOf('ANS_LENGTH') !== -1) {
-            var duration = parseFloat(data.match(/ANS_LENGTH=([0-9\.]*)/)[1]);
+        if(data.indexOf('ID_LENGTH') !== -1) {
+            var duration = parseFloat(data.match(/ID_LENGTH=([0-9\.]*)/)[1]);
             this.setStatus({
                 duration: duration
             });
@@ -133,6 +133,7 @@ CorePlayer.prototype = _.extend({
         }
     },
     onError: function(error) {
+        console.log(error.toString());
         if(this.options.debug) {
             console.log('stderr: ' + error);
         }
